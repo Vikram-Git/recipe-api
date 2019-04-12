@@ -14,5 +14,6 @@ before_script:
   - psql -c "CREATE DATABASE travisdb;" -U postgres
   - python manage.py migrate
 
-script:
-  - python manage.py test && flake8
+script: 
+  - python manage.py test
+  - python manage.py flake8
