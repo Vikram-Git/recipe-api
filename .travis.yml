@@ -15,4 +15,4 @@ before_script:
   - python manage.py migrate
 
 script:
-  - "python manage.py test && flake8"
+  - python manage.py test && flake8
