@@ -1,9 +1,13 @@
 from config.settings.base import *
 
+SECRET_KEY = 'bo+xba@bth5!wfue6p&f2-$l9kuv9nv1(pdq8+!u3ars61l!qr'
+
+DEBUG = True
+
+ALLOWED_HOSTS = []
+
 # Travis Setup
 if 'TRAVIS' in os.environ:
-    SECRET_KEY = 'bo+xba@bth5!wfue6p&f2-$l9kuv9nv1(pdq8+!u3ars61l!qr'
-
     DATABASES = {
         'default': {
             'ENGINE':   'django.db.backends.postgresql_psycopg2',
@@ -14,12 +18,11 @@ if 'TRAVIS' in os.environ:
             'PORT':     '',
         }
     }
+# Development setup    
 else:
     try:
-        from config.settings.local import *
+        from config.settings.local import DATABASES
     except:
-        SECRET_KEY = 'bo+xba@bth5!wfue6p&f2-$l9kuv9nv1(pdq8+!u3ars61l!qr'
-        
         DATABASES = {
             'default': {
                 'ENGINE': 'django.db.backends.sqlite3',
@@ -28,8 +31,4 @@ else:
         }
 
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
 
