@@ -2,6 +2,8 @@ from config.settings.base import *
 
 # Travis Setup
 if 'TRAVIS' in os.environ:
+    SECRET_KEY = 'bo+xba@bth5!wfue6p&f2-$l9kuv9nv1(pdq8+!u3ars61l!qr'
+
     DATABASES = {
         'default': {
             'ENGINE':   'django.db.backends.postgresql_psycopg2',
