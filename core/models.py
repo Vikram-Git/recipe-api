@@ -1,6 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import (AbstractBaseUser, 
-                                        BaseUserManager, 
+from django.contrib.auth.models import (AbstractBaseUser,
+                                        BaseUserManager,
                                         PermissionsMixin)
 
 
@@ -12,7 +12,7 @@ class UserManager(BaseUserManager):
         if not email:
             raise ValueError('Users must have an email address')
         user = self.model(
-                    email = self.normalize_email(email), 
+                    email = self.normalize_email(email),
                     **extra_fields
                     )
         user.set_password(password)
