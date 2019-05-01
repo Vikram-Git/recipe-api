@@ -96,4 +96,5 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media_root')
 
 
 # Users
+
 AUTH_USER_MODEL = 'core.User'
