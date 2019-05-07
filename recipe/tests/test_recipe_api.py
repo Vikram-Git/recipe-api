@@ -269,6 +269,21 @@ class PrivateRecipeApiTest(TestCase):
         self.assertIn(serializer2.data, response.data)
         self.assertNotIn(serializer3.data, response.data)
 
+    def test_delete_recipes(self):
+        '''Test deleting recipes'''
+        recipe1 = sample_recipe(user=self.user, title='Paneer Bhurji')
+        recipe2 = sample_recipe(user=self.user, title='Butter Naan')
+        recipe3 = sample_recipe(user=self.user, title='Malai Lassi')
+
+        url = recipe_detail_url(recipe3.id)
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        recipes = Recipe.objects.all()
+        self.assertIn(recipe1, recipes)
+        self.assertIn(recipe2, recipes)
+        self.assertNotIn(recipe3, recipes)
+
 
 # Since we have some repeated functions to test upload, hence a seperate class
 class RecipeImageUploadTest(TestCase):

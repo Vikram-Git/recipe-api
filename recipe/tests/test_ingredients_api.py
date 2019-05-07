@@ -5,12 +5,12 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from core.models import Ingredient
+from core.models import Ingredient, Recipe
 
 from recipe.serializers import IngredientSerializer
 
 
-INGREDIENT_URL = reverse('recipe:ingredient-list')
+INGREDIENTS_URL = reverse('recipe:ingredient-list')
 
 
 class PublicIngredientsApiTests(TestCase):
@@ -21,7 +21,7 @@ class PublicIngredientsApiTests(TestCase):
 
     def test_login_required(self):
         '''Test that login is required to access ingredient endpoint'''
-        response = self.client.get(INGREDIENT_URL)
+        response = self.client.get(INGREDIENTS_URL)
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
@@ -42,7 +42,7 @@ class PrivateIngredientsApiTests:
         Ingredient.objects.create(user=self.user, title='Vegan')
         Ingredient.objects.create(user=self.user, title='Dessert')
 
-        response = self.client.get(INGREDIENT_URL)
+        response = self.client.get(INGREDIENTS_URL)
 
         ingredients = Ingredient.objects.all().order_by('-title')
         serializer = IngredientSerializer(ingredients, many=True)
@@ -59,7 +59,7 @@ class PrivateIngredientsApiTests:
         Ingredient.objects.create(user=user2, title='Vinegar')
         ingredient = Ingredient.objects.create(user=self.user, title='Curd')
 
-        response = self.client.get(INGREDIENT_URL)
+        response = self.client.get(INGREDIENTS_URL)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
@@ -68,7 +68,7 @@ class PrivateIngredientsApiTests:
     def test_create_ingredient_successful(self):
         '''Test creating a new tag'''
         payload = {'title': 'Cabbage'}
-        response = self.client.post(INGREDIENT_URL, payload)
+        response = self.client.post(INGREDIENTS_URL, payload)
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
@@ -81,6 +81,32 @@ class PrivateIngredientsApiTests:
     def test_create_ingredient_invalid(self):
         '''Test creating a new tag with invalid payload'''
         payload = {'title': ''}
-        response = self.client.post(INGREDIENT_URL, payload)
+        response = self.client.post(INGREDIENTS_URL, payload)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_retrieve_ingredients_assigned_to_recipes(self):
+        '''Test filtering only those ingredients assigned to recipes'''
+        ingredient1 = Ingredient.objects.create(
+            user=self.user,
+            title='Paneer'
+        )
+        ingredient2 = Ingredient.objects.create(
+            user=self.user,
+            title='Milk Cream'
+        )
+        recipe = Recipe.objects.create(
+            user=self.user,
+            title='Paalak Paneer',
+            price=10.00,
+            time_minutes=20
+        )
+
+        recipe.ingredients.add(ingredient1)
+
+        response = self.client.get(INGREDIENTS_URL, {'assigned_only': 1})
+
+        serializer1 = IngredientSerializer(ingredient1)
+        serializer2 = IngredientSerializer(ingredient2)
+        self.assertIn(serializer1.data, response.data)
+        self.assertNotIn(serializer2.data, response.data)
